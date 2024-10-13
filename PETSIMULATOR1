@@ -1,0 +1,779 @@
+--[[ CREDITS TO peNnywiSEThEDANcIngCloWn
+    
+    Last Update (Sunday December 23,2018)
+    12/23/2018
+    
+    *** MAKE SURE TO LEAVE A VOUCH OR BUMP THE THREAD FOR OTHERS TO SEE! ***
+    NOW SUPPORTS BOTH 3x GAMEPASSES
+--]]
+
+local DeletePets = {
+    "Dominus Pumpkin"
+    "Dominus Cherry"
+    "Dominus Noob"
+    "Dominus Wavy"
+    "Dominus HeadStack"
+    "Dominus Damnee" -- Any pet name here will be auto-deleted after purchase!
+}
+
+local Settings = {
+    ["Destroy Client Updater"] = false, -- Stops the updating of stats BUT GREATLY REDUCES LAGG.
+    ["Auto Combine"] = {
+        ["Enabled"] = true, -- Doesn't run when set to false!
+        ["Threads"] = 1, -- Same function as the threads for auto-buy but for Auto Combine!
+        ["Gold"] = true, -- Auto Combines Pets into Gold if they are not deleted!
+        ["Rainbow"] = true, -- Auto Combines Pets into Rainbow if they are not deleted!
+        ["Dark Matter"] = true, -- Auto Combines Pets into Dark Matter if they are not deleted!
+    },
+    ["Auto Egg"] = {
+        ["Auto Egg Purchase Enabled"] = true, -- Doesn't run when set to false.
+        ["Egg Purchase Amount"] = 10000, -- Amount of Eggs you want the script to purchase! (Ends After)
+        ["Egg Tier"] = "Christmas Tier 3", -- What tier of egg you want purchased! (Tier 1-18) (Christmas Tier 1-4)
+        ["Keep All Rainbow Pets"] = false, -- Keeps ALL rainbow pets no matter the type of pet it is when set to true!
+        ["Threads"] = 50, -- How many threads of the autobuy function running? (More Threads means faster speeds but more lagg)
+        ["Triple Egg Open"] = false, -- If you have the Triple Egg Open gamepass set this to true, if you don't have it and set this to true the script will break!
+    }
+}
+
+--[[
+    
+    DO NOT EDIT BELOW
+    
+    UNLESS YOU KNOW WHAT YOU ARE DOING
+    
+    CONFIG IS ABOVE!!!!
+    
+--]]
+
+local Directory = {
+	Pets = {
+		["1001"] = {
+			DisplayName = "Cat",
+			ReferenceName = "Cat",
+			Image = "rbxassetid://2540369833",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 1",
+			Level = {1, 1},
+			GoldenImage = "rbxassetid://2540376849",
+			GoldenReferenceName = "Cat Golden"
+		},
+		["1002"] = {
+			DisplayName = "Dog",
+			ReferenceName = "Dog",
+			Image = "rbxassetid://2540371619",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 1",
+			Level = {1, 1},
+			GoldenImage = "rbxassetid://2540378330",
+			GoldenReferenceName = "Dog Golden"
+		},
+		["1003"] = {
+			DisplayName = "Bunny",
+			ReferenceName = "Bunny",
+			Image = "rbxassetid://2540369313",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 1",
+			Level = {7, 7},
+			GoldenImage = "rbxassetid://2540376513",
+			GoldenReferenceName = "Bunny Golden"
+		},
+		["1004"] = {
+			DisplayName = "Lamb",
+			ReferenceName = "Lamb",
+			Image = "rbxassetid://2540391534",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 1",
+			Level = {6, 6},
+			GoldenImage = "rbxassetid://2540381634",
+			GoldenReferenceName = "Lamb Golden"
+		},
+		["1005"] = {
+			DisplayName = "Orange Cat",
+			ReferenceName = "Cat Orange",
+			Image = "rbxassetid://2540369915",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 1",
+			Level = {7, 7},
+			GoldenImage = "rbxassetid://2540376849",
+			GoldenReferenceName = "Cat Golden"
+		},
+		["2001"] = {
+			DisplayName = "Brown Cat",
+			ReferenceName = "Cat Brown",
+			Image = "rbxassetid://2540369760",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 2",
+			Level = {14, 16},
+			GoldenImage = "rbxassetid://2540376849",
+			GoldenReferenceName = "Cat Golden"
+		},
+		["2002"] = {
+			DisplayName = "White Cat",
+			ReferenceName = "Cat White",
+			Image = "rbxassetid://2540370006",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 2",
+			Level = {14, 16},
+			GoldenImage = "rbxassetid://2540376849",
+			GoldenReferenceName = "Cat Golden"
+		},
+		["2003"] = {
+			DisplayName = "White Dog",
+			ReferenceName = "Dog White",
+			Image = "rbxassetid://2540371972",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 2",
+			Level = {16, 18},
+			GoldenImage = "rbxassetid://2540378330",
+			GoldenReferenceName = "Dog Golden"
+		},
+		["2004"] = {
+			DisplayName = "Mouse",
+			ReferenceName = "Mouse",
+			Image = "rbxassetid://2540392664",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 2",
+			Level = {16, 18},
+			GoldenImage = "rbxassetid://2540382468",
+			GoldenReferenceName = "Mouse Golden"
+		},
+		["2005"] = {
+			DisplayName = "White Bunny",
+			ReferenceName = "Bunny White",
+			Image = "rbxassetid://2540369396",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 2",
+			Level = {26, 28},
+			GoldenImage = "rbxassetid://2540376513",
+			GoldenReferenceName = "Bunny Golden"
+		},
+		["3001"] = {
+			DisplayName = "Dalmatian",
+			ReferenceName = "Dog Dalmatian",
+			Image = "rbxassetid://2540371723",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 3",
+			Level = {32, 38},
+			GoldenImage = "rbxassetid://2551498938",
+			GoldenReferenceName = "Dog Dalmatian Golden"
+		},
+		["3002"] = {
+			DisplayName = "Bear",
+			ReferenceName = "Bear",
+			Image = "rbxassetid://2540368795",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 3",
+			Level = {32, 38},
+			GoldenImage = "rbxassetid://2540376002",
+			GoldenReferenceName = "Bear Golden"
+		},
+		["3003"] = {
+			DisplayName = "Polar Bear",
+			ReferenceName = "Polar Bear",
+			Image = "rbxassetid://2540393525",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 3",
+			Level = {33, 39},
+			GoldenImage = "rbxassetid://2540383286",
+			GoldenReferenceName = "Polar Bear Golden"
+		},
+		["3004"] = {
+			DisplayName = "Pig",
+			ReferenceName = "Pig",
+			Image = "rbxassetid://2540393270",
+			Rarity = 1,
+			Height = 1,
+			Egg = "Tier 3",
+			Level = {33, 39},
+			GoldenImage = "rbxassetid://2540382940",
+			GoldenReferenceName = "Pig Golden"
+		},
+		["3005"] = {
+			DisplayName = "Panda",
+			ReferenceName = "Panda",
+			Image = "rbxassetid://2540393122",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 3",
+			Level = {54, 66},
+			GoldenImage = "rbxassetid://2540382802",
+			GoldenReferenceName = "Panda Golden"
+		},
+		["4001"] = {
+			DisplayName = "Koala",
+			ReferenceName = "Koala",
+			Image = "rbxassetid://2540391182",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 4",
+			Level = {59, 71},
+			GoldenImage = "rbxassetid://2540380676",
+			GoldenReferenceName = "Koala Golden"
+		},
+		["4002"] = {
+			DisplayName = "Crocodile",
+			ReferenceName = "Crocodile",
+			Image = "",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 4",
+			Level = {59, 71},
+			GoldenImage = "rbxassetid://2540377505",
+			GoldenReferenceName = "Crocodile Golden"
+		},
+		["4003"] = {
+			DisplayName = "Platypus",
+			ReferenceName = "Platypus",
+			Image = "rbxassetid://2540393380",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 4",
+			Level = {59, 71},
+			GoldenImage = "rbxassetid://2540383153",
+			GoldenReferenceName = "Platypus Golden"
+		},
+		["4004"] = {
+			DisplayName = "Seal",
+			ReferenceName = "Seal",
+			Image = "rbxassetid://2540395114",
+			Rarity = 2,
+			Height = 0.8,
+			Egg = "Tier 4",
+			Level = {59, 71},
+			GoldenImage = "rbxassetid://2540385056",
+			GoldenReferenceName = "Seal Golden"
+		},
+		["4005"] = {
+			DisplayName = "Racoon",
+			ReferenceName = "Racoon",
+			Image = "rbxassetid://2540394146",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 4",
+			Level = {77, 93},
+			GoldenImage = "rbxassetid://2540383748",
+			GoldenReferenceName = "Racoon Golden"
+		},
+		["5001"] = {
+			DisplayName = "Owl",
+			ReferenceName = "Owl",
+			Image = "rbxassetid://2540392953",
+			Rarity = 2,
+			Height = 3,
+			Egg = "Tier 5",
+			Level = {81, 99},
+			GoldenImage = "rbxassetid://2540382671",
+			GoldenReferenceName = "Owl Golden"
+		},
+		["5002"] = {
+			DisplayName = "Monkey",
+			ReferenceName = "Monkey",
+			Image = "rbxassetid://2540392410",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 5",
+			Level = {81, 99},
+			GoldenImage = "rbxassetid://2540382324",
+			GoldenReferenceName = "Monkey Golden"
+		},
+		["5003"] = {
+			DisplayName = "Turtle",
+			ReferenceName = "Turtle",
+			Image = "rbxassetid://2540398740",
+			Rarity = 2,
+			Height = 1,
+			Egg = "Tier 5",
+			Level = {81, 99},
+			GoldenImage = "rbxassetid://2540388028",
+			GoldenReferenceName = "Turtle Golden"
+		},
+		["5004"] = {
+			DisplayName = "Bat",
+			ReferenceName = "Bat",
+			Image = "rbxassetid://2540368673",
+			Rarity = 2,
+			Height = 3,
+			Egg = "Tier 5",
+			Level = {81, 99},
+			GoldenImage = "rbxassetid://2540375713",
+			GoldenReferenceName = "Bat Golden"
+		},
+		["5005"] = {
+			DisplayName = "Bee",
+			ReferenceName = "Bee",
+			Image = "rbxassetid://2540368910",
+			Rarity = 4,
+			Height = 3,
+			Egg = "Tier 5",
+			Level = {109, 133},
+			GoldenImage = "rbxassetid://2540376135",
+			GoldenReferenceName = "Bee Golden"
+		},
+		["6001"] = {
+			DisplayName = "Cheeta",
+			ReferenceName = "Cheeta",
+			Image = "rbxassetid://2540370162",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 6",
+			Level = {135, 165},
+			GoldenImage = "rbxassetid://2540376955",
+			GoldenReferenceName = "Cheeta Golden"
+		},
+		["6002"] = {
+			DisplayName = "Tiger",
+			ReferenceName = "Tiger",
+			Image = "rbxassetid://2540398531",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 6",
+			Level = {135, 165},
+			GoldenImage = "rbxassetid://2540387866",
+			GoldenReferenceName = "Tiger Golden"
+		},
+		["6003"] = {
+			DisplayName = "Zebra",
+			ReferenceName = "Zebra",
+			Image = "rbxassetid://2540401618",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 6",
+			Level = {135, 165},
+			GoldenImage = "rbxassetid://2540389105",
+			GoldenReferenceName = "Zebra Golden"
+		},
+		["6004"] = {
+			DisplayName = "Ladybug",
+			ReferenceName = "Ladybug",
+			Image = "rbxassetid://2540391346",
+			Rarity = 3,
+			Height = 1,
+			Egg = "Tier 6",
+			Level = {155, 189},
+			GoldenImage = "rbxassetid://2540381183",
+			GoldenReferenceName = "Ladybug Golden"
+		},
+		["7001"] = {
+			DisplayName = "Watermelon",
+			ReferenceName = "Watermelon",
+			Image = "rbxassetid://2540398990",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 7",
+			Level = {198, 242},
+			GoldenImage = "rbxassetid://2540388314",
+			GoldenReferenceName = "Watermelon Golden"
+		},
+		["7002"] = {
+			DisplayName = "Yeti",
+			ReferenceName = "Yeti",
+			Image = "rbxassetid://2540401324",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 7",
+			Level = {198, 242},
+			GoldenImage = "rbxassetid://2540388892",
+			GoldenReferenceName = "Yeti Golden"
+		},
+		["7003"] = {
+			DisplayName = "Slime",
+			ReferenceName = "Slime",
+			Image = "rbxassetid://2540395937",
+			Rarity = 4,
+			Height = 0.8,
+			Egg = "Tier 7",
+			Level = {198, 242},
+			GoldenImage = "rbxassetid://2540385700",
+			GoldenReferenceName = "Slime Golden"
+		},
+		["7004"] = {
+			DisplayName = "Dragon",
+			ReferenceName = "Dragon",
+			Image = "rbxassetid://2540374349",
+			Rarity = 5,
+			Height = 3,
+			Egg = "Tier 7",
+			Level = {225, 275},
+			GoldenImage = "rbxassetid://2540379139",
+			GoldenReferenceName = "Dragon Golden"
+		},
+		["8001"] = {
+			DisplayName = "Bomb",
+			ReferenceName = "Bomb",
+			Image = "rbxassetid://2540369199",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 8",
+			Level = {383, 467},
+			GoldenImage = "rbxassetid://2540376367",
+			GoldenReferenceName = "Bomb Golden"
+		},
+		["8002"] = {
+			DisplayName = "Ghost",
+			ReferenceName = "Ghost",
+			Image = "rbxassetid://2540374785",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 8",
+			Level = {383, 467},
+			GoldenImage = "rbxassetid://2540379366",
+			GoldenReferenceName = "Ghost Golden"
+		},
+		["8003"] = {
+			DisplayName = "Cherry Monkey",
+			ReferenceName = "Monkey Cherry",
+			Image = "rbxassetid://2540392256",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 8",
+			Level = {383, 467},
+			GoldenImage = "rbxassetid://2540382324",
+			GoldenReferenceName = "Monkey Golden"
+		},
+		["8004"] = {
+			DisplayName = "Demon",
+			ReferenceName = "Demon",
+			Image = "rbxassetid://2540371448",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 8",
+			Level = {765, 935},
+			GoldenImage = "rbxassetid://2540378208",
+			GoldenReferenceName = "Demon Golden"
+		},
+		["8005"] = {
+			DisplayName = "Cyclops",
+			ReferenceName = "Cyclops",
+			Image = "rbxassetid://2540371208",
+			Rarity = 4,
+			Height = 1,
+			Egg = "Tier 8",
+			Level = {384, 468},
+			GoldenImage = "rbxassetid://2540377754",
+			GoldenReferenceName = "Cyclops Golden"
+		},
+		["9001"] = {
+			DisplayName = "Fantasy Dragon",
+			ReferenceName = "Dragon Fantasy",
+			Image = "rbxassetid://2540374475",
+			Rarity = 5,
+			Height = 3,
+			Egg = "Tier 9",
+			Level = {675, 825},
+			GoldenImage = "rbxassetid://2540379139",
+			GoldenReferenceName = "Dragon Golden"
+		},
+		["9002"] = {
+			DisplayName = "Cherry Bomb",
+			ReferenceName = "Bomb Cherry",
+			Image = "rbxassetid://2540369074",
+			Rarity = 5,
+			Height = 1,
+			Egg = "Tier 9",
+			Level = {675, 825},
+			GoldenImage = "rbxassetid://2540376367",
+			GoldenReferenceName = "Bomb Golden"
+		},
+		["9003"] = {
+			DisplayName = "Wavy Zebra",
+			ReferenceName = "Zebra Wavy",
+			Image = "rbxassetid://2540400076",
+			Rarity = 5,
+			Height = 1,
+			Egg = "Tier 9",
+			Level = {675, 825},
+			GoldenImage = "rbxassetid://2540389105",
+			GoldenReferenceName = "Zebra Golden"
+		},
+		["9004"] = {
+			DisplayName = "Wavy Cheeta",
+			ReferenceName = "Cheeta Wavy",
+			Image = "rbxassetid://2540399377",
+			Rarity = 5,
+			Height = 1,
+			Egg = "Tier 9",
+			Level = {675, 825},
+			GoldenImage = "rbxassetid://2540376955",
+			GoldenReferenceName = "Cheeta Golden"
+		},
+		["9005"] = {
+			DisplayName = "Wavy Tiger",
+			ReferenceName = "Tiger Wavy",
+			Image = "rbxassetid://2540399958",
+			Rarity = 5,
+			Height = 1,
+			Egg = "Tier 9",
+			Level = {675, 825},
+			GoldenImage = "rbxassetid://2540387866",
+			GoldenReferenceName = "Tiger Golden"
+		},
+		["10001"] = {
+			DisplayName = "Lava Zebra",
+			ReferenceName = "Zebra Lava",
+			Image = "rbxassetid://2540401483",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1260, 1540},
+			GoldenImage = "rbxassetid://2540389105",
+			GoldenReferenceName = "Zebra Golden"
+		},
+		["10002"] = {
+			DisplayName = "Lava Dalmatian",
+			ReferenceName = "Dog Lava Dalmatian",
+			Image = "rbxassetid://2540371829",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1260, 1540},
+			GoldenImage = "rbxassetid://2551498938",
+			GoldenReferenceName = "Dog Dalmatian Golden"
+		},
+		["10003"] = {
+			DisplayName = "Lava Turtle",
+			ReferenceName = "Turtle Lava",
+			Image = "rbxassetid://2540398635",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1260, 1540},
+			GoldenImage = "rbxassetid://2540388028",
+			GoldenReferenceName = "Turtle Golden"
+		},
+		["10004"] = {
+			DisplayName = "Electric Slime",
+			ReferenceName = "Slime Electric",
+			Image = "rbxassetid://2540395814",
+			Rarity = 6,
+			Height = 0.8,
+			Egg = "Tier 10",
+			Level = {1485, 1815},
+			GoldenImage = "rbxassetid://2540385700",
+			GoldenReferenceName = "Slime Golden"
+		},
+		["10005"] = {
+			DisplayName = "Electric Ghost",
+			ReferenceName = "Ghost Electric",
+			Image = "rbxassetid://2540374681",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1485, 1815},
+			GoldenImage = "rbxassetid://2540379366",
+			GoldenReferenceName = "Ghost Golden"
+		},
+		["10006"] = {
+			DisplayName = "Dominus Messor",
+			ReferenceName = "Dominus Messor",
+			Image = "rbxassetid://2540372896",
+			Rarity = 9,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1710, 2090},
+			GoldenImage = "rbxassetid://2540378825",
+			GoldenReferenceName = "Dominus Golden"
+		},
+		["10007"] = {
+			DisplayName = "Dominus Frigidus",
+			ReferenceName = "Dominus Frigidus",
+			Image = "rbxassetid://2540372155",
+			Rarity = 9,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1710, 2090},
+			GoldenImage = "rbxassetid://2540378825",
+			GoldenReferenceName = "Dominus Golden"
+		},
+		["10008"] = {
+			DisplayName = "Dominus Empyreus",
+			ReferenceName = "Dominus Empyreus",
+			Image = "rbxassetid://2540374131",
+			Rarity = 9,
+			Height = 1,
+			Egg = "Tier 10",
+			Level = {1710, 2090},
+			GoldenImage = "rbxassetid://2540378825",
+			GoldenReferenceName = "Dominus Golden"
+		},
+		["11001"] = {
+			DisplayName = "Zombie",
+			ReferenceName = "Zombie",
+			Image = "rbxassetid://2540401989",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 11",
+			Level = {2070, 2528},
+			GoldenImage = "rbxassetid://2540389611",
+			GoldenReferenceName = "Zombie Golden"
+		},
+		["11002"] = {
+			DisplayName = "Sherbert",
+			ReferenceName = "Sherbert",
+			Image = "rbxassetid://2540395261",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 11",
+			Level = {2070, 2528},
+			GoldenImage = "rbxassetid://2540385213",
+			GoldenReferenceName = "Sherbert Golden"
+		},
+		["11003"] = {
+			DisplayName = "Robot",
+			ReferenceName = "Robot",
+			Image = "rbxassetid://2540394693",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 11",
+			Level = {2070, 2528},
+			GoldenImage = "rbxassetid://2540384526",
+			GoldenReferenceName = "Robot Golden"
+		},
+		["11004"] = {
+			DisplayName = "Lava Watermelon",
+			ReferenceName = "Watermelon Lava",
+			Image = "rbxassetid://2540391700",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 11",
+			Level = {2070, 2528},
+			GoldenImage = "rbxassetid://2540388314",
+			GoldenReferenceName = "Watermelon Golden"
+		},
+		["11005"] = {
+			DisplayName = "Wavy Bee",
+			ReferenceName = "Bee Wavy",
+			Image = "rbxassetid://2540399251",
+			Rarity = 6,
+			Height = 3,
+			Egg = "Tier 11",
+			Level = {2070, 2528},
+			GoldenImage = "rbxassetid://2540376135",
+			GoldenReferenceName = "Bee Golden"
+		},
+		["11006"] = {
+			DisplayName = "Unicorn",
+			ReferenceName = "Unicorn",
+			Image = "rbxassetid://2540398868",
+			Rarity = 7,
+			Height = 1,
+			Egg = "Tier 11",
+			Level = {2520, 3080},
+			GoldenImage = "rbxassetid://2540388157",
+			GoldenReferenceName = "Unicorn Golden"
+		},
+		["12001"] = {
+			DisplayName = "Tank",
+			ReferenceName = "Tank",
+			Image = "rbxassetid://2540398413",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {3600, 4398},
+			GoldenImage = "rbxassetid://2540387722",
+			GoldenReferenceName = "Tank Golden"
+		},
+		["12002"] = {
+			DisplayName = "Reaper",
+			ReferenceName = "Reaper",
+			Image = "rbxassetid://2540394424",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {3600, 4398},
+			GoldenImage = "rbxassetid://2540384251",
+			GoldenReferenceName = "Reaper Golden"
+		},
+		["12003"] = {
+			DisplayName = "Angel",
+			ReferenceName = "Angel",
+			Image = "rbxassetid://2540368494",
+			Rarity = 6,
+			Height = 3,
+			Egg = "Tier 12",
+			Level = {3600, 4398},
+			GoldenImage = "rbxassetid://2540375584",
+			GoldenReferenceName = "Angel Golden"
+		},
+		["12004"] = {
+			DisplayName = "Fire King",
+			ReferenceName = "Fire King",
+			Image = "rbxassetid://2540374573",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {3870, 4730},
+			GoldenImage = "rbxassetid://2540379259",
+			GoldenReferenceName = "Fire King Golden"
+		},
+		["12005"] = {
+			DisplayName = "Ice Queen",
+			ReferenceName = "Ice Queen",
+			Image = "rbxassetid://2540390852",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {3870, 4730},
+			GoldenImage = "rbxassetid://2540380302",
+			GoldenReferenceName = "Ice Queen Golden"
+		},
+		["12006"] = {
+			DisplayName = "Immortuos",
+			ReferenceName = "Immortuos",
+			Image = "rbxassetid://2540390999",
+			Rarity = 8,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {6500, 8500},
+			GoldenImage = "rbxassetid://2540380450",
+			GoldenReferenceName = "Immortuos Golden"
+		},
+		["12007"] = {
+			DisplayName = "Mortuus",
+			ReferenceName = "Mortuus",
+			Image = "rbxassetid://2540392545",
+			Rarity = 10,
+			Height = 1,
+			Egg = "Tier 12",
+			Level = {45000, 55000},
+			GoldenImage = "rbxassetid://2540380450",
+			GoldenReferenceName = "Immortuos Golden"
+		},
+		["13001"] = {
+			DisplayName = "Alien",
+			ReferenceName = "Alien",
+			Image = "rbxassetid://2540368158",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 13",
+			Level = {7560, 9240},
+			GoldenImage = "rbxassetid://2540375164",
+			GoldenReferenceName = "Alien Golden"
+		},
+		["13002"] = {
+			DisplayName = "Puffer",
+			ReferenceName = "Puffer",
+			Image = "rbxassetid://2540393754",
+			Rarity = 6,
+			Height = 1,
+			Egg = "Tier 13",
+			Level = {7200, 8800},
+			GoldenImage = "rbxassetid://2540383461",
+			GoldenReferenceName = "Puffer Golden"
+		},
+		["13003"] = {
+			DisplayName = "Wooga",
+			ReferenceName = "Wooga",
+			Image = "rbxassetid:
