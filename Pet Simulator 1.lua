@@ -590,15 +590,8 @@ end)
 
 local FarmLvLStart = false 
 
-FarmingTab:CreateToggle({
-    Name = "Auto Lvlling",
-    CurrentValue = FarmLvLStart,
-    Callback = function(Value)
-        FarmLvLStart = Value
-    end
-})
-
 local LVLTOCREARING = 50e6
+
 local BigTargets = {
     ["Christmas2 Small Chest"] = true,
     ["Christmas2 Chest"] = true,
@@ -688,6 +681,14 @@ task.spawn(function()
         task.wait(1)
     end
 end)
+
+FarmingTab:CreateToggle({
+    Name = "Auto Lvlling",
+    CurrentValue = FarmLvLStart,
+    Callback = function(Value)
+        FarmLvLStart = Value
+    end
+})
 
 local FarmingSection = FarmingTab:CreateSection("Farm Settings")
 
