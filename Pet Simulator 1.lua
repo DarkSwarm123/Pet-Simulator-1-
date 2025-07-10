@@ -351,8 +351,11 @@ local function DeleteOtherUnwantedPets()
     end)()
 end
 
--- Funkcja zakupu jajek
+local turbo = true
 local function BuyEgg(tier)
+if not turbo then 
+task.wait()
+end
     local success, result = workspace["__REMOTES"]["Game"]["Shop"]:InvokeServer("Buy", "Eggs", tier, Settings["Auto Egg"]["Triple Egg Open"])
     if not success then
         warn("Nie udało się kupić jajka: " .. tostring(result))
