@@ -386,7 +386,6 @@ local function AutoEggMain()
 
             if not selectedTier then break end
 
-            -- Sprawdzanie miejsca w ekwipunku
             local stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
             local currentPets = #stats.Save.Pets
             local maxPets = stats.Save.PetSlots
@@ -394,21 +393,19 @@ local function AutoEggMain()
 
             if maxPets - currentPets < requiredFreeSlots then
                 repeat
-                    task.wait()
+                    task.wait(1)
                     stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
                     currentPets = #stats.Save.Pets
+
                 until maxPets - currentPets >= requiredFreeSlots
             end
 
-            -- Zakup jajka
             local success = BuyEgg(selectedTier)
             if not success then break end
-            Wait(4)
         end
     end)()
 end
 
--- Funkcja automatycznego łączenia zwierzaków
 local function AutoCombineCheck()
     if not AutoCombineRunning then return end
     coroutine.wrap(function()
