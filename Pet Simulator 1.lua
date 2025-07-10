@@ -353,12 +353,8 @@ end
 
 -- Funkcja zakupu jajek
 local function BuyEgg(tier)
-    print("Próbuję kupić jajko z tierem: " .. tier)
-
     local success, result = workspace["__REMOTES"]["Game"]["Shop"]:InvokeServer("Buy", "Eggs", tier, Settings["Auto Egg"]["Triple Egg Open"])
-    if success then
-        print("Pomyślnie zakupiono jajko.")
-    else
+    if not success then
         warn("Nie udało się kupić jajka: " .. tostring(result))
     end
     return success
