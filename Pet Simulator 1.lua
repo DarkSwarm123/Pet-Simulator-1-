@@ -647,7 +647,7 @@ local function AssignAndMine(pet, coin)
     task.spawn(function()
         while FarmStart and coin and coin:IsDescendantOf(workspace["__THINGS"].Coins) do
             workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", coin.Name, pet.LEVEL, pet.ID)
-            task.wait(0.2)
+            task.wait()
         end
         ActivePets[pet.ID] = nil 
     end)
