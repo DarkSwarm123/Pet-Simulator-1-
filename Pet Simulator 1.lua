@@ -366,7 +366,7 @@ end
 
 -- Główna funkcja Auto Egg
 local function AutoEggMain()
-    coroutine.wrap(function()
+    task.spawn(function()
         while true do
             local selectedTier = nil
             for i = 1, 4 do
