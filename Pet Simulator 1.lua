@@ -462,32 +462,35 @@ local function AutoCombineCheck()
     end)()
 end
 
+local TierToggles = {}
+
 local function AddTierToggles(tab, sectionName, prefix, rangeStart, rangeEnd)
     local section = tab:CreateSection(sectionName)
-    local step = rangeStart < rangeEnd and 1 or -1 -- Automatyczne określenie kroku (rosnąca lub malejąca kolejność)
+    local step = rangeStart < rangeEnd and 1 or -1
+
     for i = rangeStart, rangeEnd, step do
-        tab:CreateToggle({
-            Name = "Enable " .. prefix .. " " .. i .. " Auto Egg",
-            CurrentValue = Settings["Auto Egg"][prefix .. " " .. i],
+        local tierKey = prefix .. " " .. i
+        local toggle = tab:CreateToggle({
+            Name = "Enable " .. tierKey .. " Auto Egg",
+            CurrentValue = Settings["Auto Egg"][tierKey],
             Flag = prefix:gsub(" ", "") .. i .. "Toggle",
             Callback = function(Value)
-                -- Wyłączanie innych przełączników w tej kategorii
                 for j = rangeStart, rangeEnd, step do
                     Settings["Auto Egg"][prefix .. " " .. j] = false
                 end
-                Settings["Auto Egg"][prefix .. " " .. i] = Value
+                Settings["Auto Egg"][tierKey] = Value
                 if Value then
-                    task.spawn(AutoEggMain) -- Uruchamianie AutoEggMain w nowym wątku
+                    task.spawn(AutoEggMain)
                 end
             end
         })
+
+        TierToggles[tierKey] = toggle
     end
 end
 
--- Dodanie przełączników dla Christmas Tier 4–1 (malejąca kolejność)
 AddTierToggles(EggTab, "Christmas Tier", "Christmas Tier", 4, 1)
 
--- Dodanie przełączników dla Tier 18–1 (malejąca kolejność)
 AddTierToggles(EggTab, "Tier", "Tier", 18, 1)
 
 local Section = SettingsTab:CreateSection("Hatching")
@@ -735,3 +738,11 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
 	end)
 	
 	Rayfield:LoadConfiguration()
+
+task.delay(0.2, function()
+    for tierKey, toggle in pairs(TierToggles) do
+        if toggle.CurrentValue then
+            toggle.Callback(true)
+        end
+    end
+end)
