@@ -590,106 +590,90 @@ task.spawn(function()
     end
 end)
 
-local FarmLvLStart = false 
+-- Ustawienia local FarmLvLStart = false local LVLTOCREARING = 50e6
 
-local LVLTOCREARING = 50e6
+local BigTargets = { ["Christmas2 Small Chest"] = true, ["Christmas2 Chest"] = true, ["Christmas2 Coin Stack"] = true }
 
-local BigTargets = {
-    ["Christmas2 Small Chest"] = true,
-    ["Christmas2 Chest"] = true,
-    ["Christmas2 Coin Stack"] = true
-}
-
-local NormalTargets = {
-    ["Christmas2 Small Coin"] = true,
-    ["Christmas2 Coin"] = true
-}
+local NormalTargets = { ["Christmas2 Small Coin"] = true, ["Christmas2 Coin"] = true }
 
 local HighPets, LowPets = {}, {}
 
-local function GetPetLevelWithHat(petData, hats)
-    local level = tonumber(petData.l) or 0
-    if petData.h then
-        for _, hat in pairs(hats) do
-            if hat.id == petData.h then
-                level = level + (tonumber(hat.l) or 0)
-                break
-            end
-        end
-    end
-    return level
-end
+local function GetPetLevelWithHat(petData, hats) local level = tonumber(petData.l) or 0 if petData.h then for _, hat in pairs(hats) do if hat.id == petData.h then level = level + (tonumber(hat.l) or 0) break end end end return level end
 
-local function UpdateLvLPetTable()
-    local Stats = workspace["__REMOTES"]["Core"]["Get Other Stats"]:InvokeServer()
-    local PlayerStats = Stats[game.Players.LocalPlayer.Name]
-    local Pets = PlayerStats["Save"]["Pets"]
-    local Hats = PlayerStats["Save"]["Hats"]
+local function UpdateLvLPetTable() local success, Stats = pcall(function() return workspace["__REMOTES"]["Core"]["Get Other Stats"]:InvokeServer() end) if not success or not Stats then return end
 
-    HighPets, LowPets = {}, {}
-    for _, pet in ipairs(Pets) do
-        if pet.e then
-            local data = {
-                ID = tonumber(pet.id),
-                LEVEL = GetPetLevelWithHat(pet, Hats)
-            }
-            if data.LEVEL > LVLTOCREARING then
-                table.insert(HighPets, data)
-            else
-                table.insert(LowPets, data)
-            end
+local PlayerStats = Stats[game.Players.LocalPlayer.Name]
+if not PlayerStats then return end
+
+local Pets = PlayerStats["Save"]["Pets"]
+local Hats = PlayerStats["Save"]["Hats"]
+
+HighPets, LowPets = {}, {}
+for _, pet in ipairs(Pets) do
+    if pet.e then
+        local data = {
+            ID = tonumber(pet.id),
+            LEVEL = GetPetLevelWithHat(pet, Hats)
+        }
+        if data.LEVEL > LVLTOCREARING then
+            table.insert(HighPets, data)
+        else
+            table.insert(LowPets, data)
         end
     end
 end
 
-local ActivePets = {}
-local function AssignAndMine(pet, coin)
-    if ActivePets[pet.ID] then return end
-    ActivePets[pet.ID] = true
-    task.spawn(function()
-        while FarmStart and coin and coin:IsDescendantOf(workspace["__THINGS"].Coins) do
-            workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", coin.Name, pet.LEVEL, pet.ID)
-            task.wait()
-        end
-        ActivePets[pet.ID] = nil 
-    end)
 end
+
+local ActivePets = {} local function AssignAndMine(pet, coin) if ActivePets[pet.ID] then return end ActivePets[pet.ID] = true
 
 task.spawn(function()
-    while true do
-        if FarmLvLStart then
-            UpdateLvLPetTable()
-            local BigCoins, NormalCoins = {}, {}
-
-            for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
-                if Coin:FindFirstChild("CoinName") then
-                    local name = Coin.CoinName.Value
-                    if BigTargets[name] then
-                        table.insert(BigCoins, Coin)
-                    elseif NormalTargets[name] then
-                        table.insert(NormalCoins, Coin)
-                    end
-                end
-            end
-
-            for i = 1, math.min(#HighPets, #BigCoins) do
-                AssignAndMine(HighPets[i], BigCoins[i])
-            end
-
-            for i = 1, math.min(#LowPets, #NormalCoins) do
-                AssignAndMine(LowPets[i], NormalCoins[i])
-            end
-        end
-        task.wait(1)
+    while FarmLvLStart and coin and coin:IsDescendantOf(workspace["__THINGS"].Coins) do
+        pcall(function()
+            workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", coin.Name, pet.LEVEL, pet.ID)
+        end)
+        task.wait(0.25) -- Zmniejszony spam
     end
+    ActivePets[pet.ID] = nil 
 end)
 
-FarmingTab:CreateToggle({
-    Name = "Auto Lvlling",
-    CurrentValue = FarmLvLStart,
-    Callback = function(Value)
-        FarmLvLStart = Value
+end
+
+-- Czyszczenie niechcianego GUI (np. SNOW) task.spawn(function() local pg = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui") while true do local snow = pg:FindFirstChild("SNOW") if snow then pcall(function() snow:Destroy() end) end task.wait(2) end end)
+
+-- Główna pętla farmy task.spawn(function() while true do if FarmLvLStart then UpdateLvLPetTable() local BigCoins, NormalCoins = {}, {}
+
+for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
+            if Coin:FindFirstChild("CoinName") then
+                local name = Coin.CoinName.Value
+                if BigTargets[name] then
+                    table.insert(BigCoins, Coin)
+                elseif NormalTargets[name] then
+                    table.insert(NormalCoins, Coin)
+                end
+            end
+        end
+
+        for i = 1, math.min(#HighPets, #BigCoins) do
+            AssignAndMine(HighPets[i], BigCoins[i])
+        end
+
+        for i = 1, math.min(#LowPets, #NormalCoins) do
+            AssignAndMine(LowPets[i], NormalCoins[i])
+        end
     end
+    task.wait(1)
+end
+
+end)
+
+FarmingTab:CreateToggle({ 
+    Name = "Auto Lvlling", 
+    CurrentValue = FarmLvLStart,
+    Flag = "Auto LvLing", 
+    Callback = function(Value) 
+        FarmLvLStart = Value
+    end 
 })
 
 local FarmingSection = FarmingTab:CreateSection("Farm Settings")
