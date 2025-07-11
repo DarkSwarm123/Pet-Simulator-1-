@@ -538,8 +538,9 @@ SettingsTab:CreateToggle({
     end
 })
 
-local FarmStart = false 
-local TargetNames = { 
+local FarmStart = false
+
+local TargetNames = {
     ["Christmas3 Cane"] = false,
     ["Christmas3 Small Cane"] = false,
     ["Christmas1 Sleigh"] = false
@@ -555,10 +556,14 @@ local function UpdatePetTable()
     PetTable = {}
     for _, pet in ipairs(Pets) do
         if pet.e then
-            table.insert(PetTable, {
-                ID = tonumber(pet.id),
-                LEVEL = tonumber(pet.l)
-            })
+            local id = tonumber(pet.id)
+            local level = tonumber(pet.l)
+            if id and level and level == level then 
+                table.insert(PetTable, {
+                    ID = id,
+                    LEVEL = level
+                })
+            end
         end
     end
 end
@@ -568,8 +573,7 @@ local function FarmCoin(Coin)
         for _, pet in ipairs(PetTable) do
             workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", Coin.Name, pet.LEVEL, pet.ID)
         end
-        task.wait()
-		
+        task.wait(0.25)
         if not Coin:IsDescendantOf(workspace["__THINGS"].Coins) then
             break
         end
@@ -579,14 +583,15 @@ end
 task.spawn(function()
     while true do
         if FarmStart then
-            UpdatePetTable() -- Aktualizacja listy zwierzaków
+            UpdatePetTable()
             for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
                 if Coin:FindFirstChild("CoinName") and TargetNames[Coin.CoinName.Value] then
                     FarmCoin(Coin)
+                    break
                 end
             end
         end
-        task.wait(1) 
+        task.wait(1)
     end
 end)
 
