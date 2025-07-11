@@ -462,7 +462,7 @@ local function AutoCombineCheck()
     end)()
 end
 
-local TierToggles = {}
+local TierToggles = {} 
 
 local function AddTierToggles(tab, sectionName, prefix, rangeStart, rangeEnd)
     local section = tab:CreateSection(sectionName)
@@ -476,8 +476,13 @@ local function AddTierToggles(tab, sectionName, prefix, rangeStart, rangeEnd)
             Flag = prefix:gsub(" ", "") .. i .. "Toggle",
             Callback = function(Value)
                 for j = rangeStart, rangeEnd, step do
-                    Settings["Auto Egg"][prefix .. " " .. j] = false
+                    local otherKey = prefix .. " " .. j
+                    Settings["Auto Egg"][otherKey] = false
+                    if TierToggles[otherKey] and otherKey ~= tierKey then
+                        TierToggles[otherKey]:Set(false) -- wyłączenie w GUI
+                    end
                 end
+
                 Settings["Auto Egg"][tierKey] = Value
                 if Value then
                     task.spawn(AutoEggMain)
