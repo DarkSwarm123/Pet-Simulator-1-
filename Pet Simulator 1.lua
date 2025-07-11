@@ -476,24 +476,22 @@ local function AddTierToggles(tab, sectionName, prefix, rangeStart, rangeEnd)
             CurrentValue = Settings["Auto Egg"][tierKey],
             Flag = prefix:gsub(" ", "") .. i .. "Toggle",
             Callback = function(Value)
-                -- Zapisanie stanu
                 Settings["Auto Egg"][tierKey] = Value
-
                 if Value then
-                    -- Wyłącz inne toggle (z opóźnieniem)
                     for j = rangeStart, rangeEnd, step do
                         local otherKey = prefix .. " " .. j
                         if otherKey ~= tierKey then
                             Settings["Auto Egg"][otherKey] = false
-                            if TierToggles[otherKey] then
+                            local otherToggle = TierToggles[otherKey]
+                            if otherToggle then
                                 task.defer(function()
-                                    TierToggles[otherKey]:Set(false)
+                                    otherToggle:Set(true)  -- najpierw true
+                                    task.wait()
+                                    otherToggle:Set(false) -- potem false (żeby wymusić wizualny update)
                                 end)
                             end
                         end
-                    end
-
-                    task.spawn(AutoEggMain)
+                    end                    task.spawn(AutoEggMain)
                 end
             end
         })
