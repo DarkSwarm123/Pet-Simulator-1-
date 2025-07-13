@@ -282,16 +282,7 @@ local Button = SettingsTab:CreateButton({
   end,
 })
 
-
-local Button = SettingsTab:CreateButton({
-   Name = "Destroy UI",
-   Callback = function()
-   Rayfield:Destroy()
-   end,
-})
-
-local function deletePet(id)
-    workspace.__REMOTES.Game.Inventory:InvokeServer("Delete", id)
+local function deletePet(id)    workspace.__REMOTES.Game.Inventory:InvokeServer("Delete", id)
 end
 
 local Button = SettingsTab:CreateButton({
