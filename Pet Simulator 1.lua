@@ -136,7 +136,7 @@ background.ZIndex = 10
 background.Visible = false
 background.Parent = screenGui
 
-local function setRendering(state)     game:GetService("RunService"):Set3dRenderingEnabled(state)
+local function setRendering(state)         game:GetService("RunService"):Set3dRenderingEnabled(state)
     background.Visible = not state
 end
 
