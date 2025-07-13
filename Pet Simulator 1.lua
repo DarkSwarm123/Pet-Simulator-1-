@@ -19,7 +19,6 @@ local Window = Rayfield:CreateWindow({
    KeySystem = false
 })
 
--- Ustawienia
 local Settings = {
     ["Auto Egg"] = {
         ["Triple Egg Open"] = false
@@ -36,7 +35,6 @@ local Settings = {
     }
 }
 
--- Dodanie nowych Tierów do ustawień
 for i = 1, 4 do
     Settings["Auto Egg"]["Christmas Tier " .. i] = false
 end
@@ -138,14 +136,11 @@ background.ZIndex = 10
 background.Visible = false
 background.Parent = screenGui
 
--- Funkcja ustawiająca render + nakładkę
-local function setRendering(state)
-    game:GetService("RunService"):Set3dRenderingEnabled(state)
+local function setRendering(state)    game:GetService("RunService"):Set3dRenderingEnabled(state)
     background.Visible = not state
 end
 
--- Rayfield Toggle
-local Tab = SettingsTab:CreateToggle({
+SettingsTab:CreateToggle({
     Name = "No Rendering",
     CurrentValue = false,
     Callback = function(Value)
@@ -153,7 +148,7 @@ local Tab = SettingsTab:CreateToggle({
     end,
 })
 
-local Button = SettingsTab:CreateButton({
+SettingsTab:CreateButton({
     Name = "Destroy Client Updater",
     Callback = function()
         for _, LaggyRemoteEvent in pairs(game.Players.LocalPlayer.PlayerGui.Events:GetChildren()) do
@@ -216,9 +211,8 @@ local function AutoHatFarm()
 
     local r = workspace.__REMOTES
     local mh = r.Core["Get Stats"]:InvokeServer().Save.HatSlots
-
     while true do
-        if not get then coroutine.yield() end  -- Zatrzymuje działanie pętli, gdy toggle jest wyłączony
+        if not get then coroutine.yield() end  
 
         local td, wt = {}, 0
         local tb = mh - #r.Core["Get Stats"]:InvokeServer().Save.Hats
@@ -243,42 +237,35 @@ local function AutoHatFarm()
     end
 end
 
--- Tworzenie coroutiny
 local hatFarmThread = coroutine.create(AutoHatFarm)
 
 local function NotifyDeletersList()
--- Łączenie listy petów w jedną wiadomość
 local deletersList = table.concat(Deleters, ", ")
-       -- Wyświetlenie powiadomienia
     Rayfield:Notify({
         Title = "Deleted pets list",
         Content = deletersList,
-        Duration = 10, -- Czas trwania powiadomienia (w sekundach)
-        Image = 4483362458, -- Opcjonalnie: zmień na ID obrazka, jeśli masz
+        Duration = 10,
+        Image = 4483362458,
     })
 end
 
 local Section = SettingsTab:CreateSection("Other")
 
--- **Dodanie przełącznika do Rayfield**
 local HatToggle = SettingsTab:CreateToggle({
     Name = "Auto Hat Farm",
     CurrentValue = false,
     Flag = "AutoHatFarmToggle",
     Callback = function(Value)
         get = Value
-        if Value then
-            coroutine.resume(hatFarmThread) -- Wznawia coroutine, jeśli toggle włączony
+        if Value then            coroutine.resume(hatFarmThread)
         end
     end
 })
-
 
 local Button = SettingsTab:CreateButton({
    Name = "Deleted pets list",
    Callback = function()
    NotifyDeletersList()
-    -- Wywołanie funkcji, aby przetestować powiadomienie
   end,
 })
 
@@ -286,33 +273,29 @@ local function deletePet(id)                    workspace.__REMOTES.Game.Invento
 end
 
 local Button = SettingsTab:CreateButton({
-   Name = "Delete NaN Pets",  -- Nazwa przycisku
+   Name = "Delete NaN Pets", 
    Callback = function()
-       -- Funkcja uruchamiana po kliknięciu przycisku
        local petData = workspace.__REMOTES.Core["Get Stats"]:InvokeServer().Save.Pets
        for i, pet in ipairs(petData) do
-           if pet.l == nil then -- Sprawdź, czy poziom jest nil
-               deletePet(pet.id) -- Usuń zwierzę, jeśli poziom jest nil
+           if pet.l == nil then
+               deletePet(pet.id)
            end
        end
        
-       -- Powiadomienie o konieczności rejoin
        Rayfield:Notify({
-           Title = "Rejoin Required",  -- Tytuł powiadomienia
-           Content = "NaN pet should be now deleted please rejoin to check",  -- Treść powiadomienia
-           Duration = 5,  -- Czas trwania powiadomienia
-           Image = 4483362458,  -- Ikona powiadomienia (możesz zmienić ID na odpowiednie)
+           Title = "Rejoin Required",  
+           Content = "NaN pet should be now deleted please rejoin to check",
+           Duration = 4, 
+           Image = 4483362458,  
        })
    end,
 })
 
 local Directory = require(game:GetService("ReplicatedStorage")["1 | Directory"])
 
--- Flagi kontrolne
 local AutoCombineRunning = false
 local AutoDeletersRunning = false
 
--- Funkcja sprawdzająca, czy zwierzak znajduje się na liście do usunięcia
 local function CheckDeleters(Info)
     for _, Deleter in pairs(Deleters) do
         if string.lower(tostring(Deleter)) == string.lower(Directory.Pets[Info].DisplayName) or 
@@ -323,7 +306,6 @@ local function CheckDeleters(Info)
     return false
 end
 
--- Funkcja usuwająca niechciane zwierzaki
 local function DeleteOtherUnwantedPets()
     if not AutoDeletersRunning then return end
     coroutine.wrap(function()
@@ -331,8 +313,7 @@ local function DeleteOtherUnwantedPets()
         for _, Pet in ipairs(Stats.Save.Pets) do
             if not AutoDeletersRunning then break end
             if CheckDeleters(Pet.n) then
-                task.defer(function()
-                    workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("Delete", Pet.id)
+                task.defer(function()                    workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("Delete", Pet.id)
                 end)
             end
         end
@@ -396,7 +377,6 @@ local function AutoCombineCheck()
     coroutine.wrap(function()
         local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
         local GoldTable, RainbowTable, DarkMatterTable = {}, {}, {}
-
         for _, Pet in ipairs(Stats.Save.Pets) do
             if not AutoCombineRunning then break end
             if tostring(Pet.n) ~= "BIG Maskot" then
