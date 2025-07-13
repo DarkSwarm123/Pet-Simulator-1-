@@ -45,22 +45,20 @@ for i = 1, 18 do
     Settings["Auto Egg"]["Tier " .. i] = false
 end
 
-local Deleters = {
+getgenv().Deleters = getgenv().Deleters or {
     "Dominus Pumpkin", "Dominus Cherry", "Dominus Noob", "Dominus Wavy", 
     "Dominus Damnee", "Dominus HeadStack", "Spike", "Aesthetic Cat", "Magic Fox", 
     "Chimera", "Gingerbread", "Festive Ame Damnee", "Reindeer", "Festive Dominus", "Festive Immortuos"
 }
 
--- Zakładka Auto Egg
+local Deleters = getgenv().Deleters
+
 local EggTab = Window:CreateTab("🐣Auto Egg", 4483362458)
 
--- Zakładka Settings 
 local SettingsTab = Window:CreateTab("⚙️Settings", 4483362458)
 
--- Zakładka Farming 
 local FarmingTab = Window:CreateTab("🌱Farming", 4483362458)
 
--- Zakładka Themes
 local ThemesTab = Window:CreateTab("🦋Themes", 4483362458)
 
 local Button = ThemesTab:CreateButton({
