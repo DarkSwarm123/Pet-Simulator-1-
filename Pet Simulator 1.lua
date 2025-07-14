@@ -309,7 +309,7 @@ end
 
 local function DeleteOtherUnwantedPets()
     if not AutoDeletersRunning then return end
-    coroutine.wrap(function()
+    task.spawn(function()
         local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
         for _, Pet in ipairs(Stats.Save.Pets) do
             if not AutoDeletersRunning then break end
@@ -375,7 +375,7 @@ end
 
 local function AutoCombineCheck()
     if not AutoCombineRunning then return end
-    coroutine.wrap(function()
+    task.spawn(function()
         local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
         local GoldTable, RainbowTable, DarkMatterTable = {}, {}, {}
         for _, Pet in ipairs(Stats.Save.Pets) do
@@ -394,7 +394,7 @@ local function AutoCombineCheck()
         -- Łączenie w Gold
         for PetN, Amount in pairs(GoldTable) do
             if Amount >= 10 then
-                coroutine.wrap(function()
+                task.spawn(function()
                     for _, Pet in ipairs(Stats.Save.Pets) do
                         if tostring(Pet.n) == tostring(PetN) and not Pet.g and not Pet.r and not Pet.dm then
                             workspace["__REMOTES"]["Game"]["Golden Pets"]:InvokeServer(Pet.id)
@@ -407,7 +407,7 @@ local function AutoCombineCheck()
         -- Łączenie w Rainbow
         for PetN, Amount in pairs(RainbowTable) do
             if Amount >= 7 then
-                coroutine.wrap(function()
+                task.spawn(function()
                     for _, Pet in ipairs(Stats.Save.Pets) do
                         if tostring(Pet.n) == tostring(PetN) and Pet.g and not Pet.r and not Pet.dm then
                             workspace["__REMOTES"]["Game"]["Rainbow Pets"]:InvokeServer(Pet.id)
@@ -420,7 +420,7 @@ local function AutoCombineCheck()
         -- Łączenie w Dark Matter
         for PetN, Amount in pairs(DarkMatterTable) do
             if Amount >= 5 then
-                coroutine.wrap(function()
+                task.spawn(function()
                     for _, Pet in ipairs(Stats.Save.Pets) do
                         if tostring(Pet.n) == tostring(PetN) and not Pet.g and Pet.r and not Pet.dm then
                             workspace["__REMOTES"]["Game"]["Dark Matter Pets"]:InvokeServer(Pet.id)
