@@ -509,6 +509,8 @@ SettingsTab:CreateToggle({
 })
 
 local FarmLvLStart = false
+local farmLvlTaskRunning = false
+local farmLvlTask
 local LVLTOCREARING = 50e6
 
 local BigTargets = {
@@ -531,7 +533,7 @@ local function GetPetLevelWithHat(petData, hats)
     if petData.h then
         for _, hat in pairs(hats) do
             if hat.id == petData.h then
-                level = level + (tonumber(hat.l) or 0)
+                level += (tonumber(hat.l) or 0)
                 break
             end
         end
@@ -555,7 +557,7 @@ local function UpdateLvLPetTable()
     for _, pet in ipairs(Pets) do
         if pet.e then
             local level = GetPetLevelWithHat(pet, Hats)
-            if level and level == level then -- zabezpieczenie przed NaN
+            if level and level == level then
                 local data = { ID = tonumber(pet.id), LEVEL = level }
                 if level > LVLTOCREARING then
                     table.insert(HighPets, data)
@@ -584,40 +586,44 @@ local function AssignAndMine(pet, coin)
     end)
 end
 
-task.spawn(function()
-    while true do
-        if FarmLvLStart then
-            UpdateLvLPetTable()
-
-            local BigCoins, NormalCoins = {}, {}
-            for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
-                if Coin:FindFirstChild("CoinName") then
-                    local name = Coin.CoinName.Value
-                    if BigTargets[name] then
-                        table.insert(BigCoins, Coin)
-                    elseif NormalTargets[name] then
-                        table.insert(NormalCoins, Coin)
-                    end
-                end
-            end
-
-            for i = 1, math.min(#HighPets, #BigCoins) do
-                AssignAndMine(HighPets[i], BigCoins[i])
-            end
-            for i = 1, math.min(#LowPets, #NormalCoins) do
-                AssignAndMine(LowPets[i], NormalCoins[i])
-            end
-        end
-        task.wait(1)
-    end
-end)
-
 FarmingTab:CreateToggle({
-    Name = "Auto Lvlling",
+    Name = "Auto Lvling",
     CurrentValue = FarmLvLStart,
     Flag = "AutoLvlingToggle",
     Callback = function(Value)
         FarmLvLStart = Value
+        if Value and not farmLvlTaskRunning then
+            farmLvlTaskRunning = true
+            farmLvlTask = task.spawn(function()
+                while FarmLvLStart do
+                    UpdateLvLPetTable()
+
+                    local BigCoins, NormalCoins = {}, {}
+                    for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
+                        if Coin:FindFirstChild("CoinName") then
+                            local name = Coin.CoinName.Value
+                            if BigTargets[name] then
+                                table.insert(BigCoins, Coin)
+                            elseif NormalTargets[name] then
+                                table.insert(NormalCoins, Coin)
+                            end
+                        end
+                    end
+
+                    for i = 1, math.min(#HighPets, #BigCoins) do
+                        AssignAndMine(HighPets[i], BigCoins[i])
+                    end
+                    for i = 1, math.min(#LowPets, #NormalCoins) do
+                        AssignAndMine(LowPets[i], NormalCoins[i])
+                    end
+
+                    task.wait(1)
+                end
+                farmLvlTaskRunning = false
+                ActivePets = {}
+                AssignedCoins = {}
+            end)
+        end
     end
 })
 
