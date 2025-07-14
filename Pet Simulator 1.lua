@@ -263,6 +263,16 @@ local function Wait(x)
     for i = 1, x do task.wait() end
 end
 
+local function NotifyDeletersList()
+    local message = table.concat(Deleters, ", ")
+    Rayfield:Notify({
+        Title = "Deleted Pets List",
+        Content = message,
+        Duration = 5,
+        Image = 4483362458,
+    })
+end
+
 local Button = SettingsTab:CreateButton({
    Name = "Deleted pets list",
    Callback = function()
