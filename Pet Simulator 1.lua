@@ -159,7 +159,10 @@ SettingsTab:CreateButton({
 })
 
 local get = false
+local hatFarmRunning = false
+local hatFarmThread
 local Hat = 'Robux'
+
 local Hats = {
     [40005] = {"Hat Stack",4},
     [40006] = {"Blue Top Hat",4},
@@ -195,31 +198,28 @@ local Hats = {
     [20003] = {"Princess Hat",2},
 }
 
-local function Wait(x)
-    for i = 1, x do
-        task.wait()
-    end
-end
-
 local function AutoHatFarm()
+    if hatFarmRunning then return end -- nie uruchamiaj drugi raz
+    hatFarmRunning = true
+
     local present, id
     for i, v in pairs(Hats) do
         if v[1] == Hat then
             id = i
             present = v[2] == 5 and 'Golden' or 'Tier ' .. v[2]
+            break
         end
     end
 
     local r = workspace.__REMOTES
     local mh = r.Core["Get Stats"]:InvokeServer().Save.HatSlots
-    while true do
-        if not get then coroutine.yield() end  
 
+    while get do
         local td, wt = {}, 0
         local tb = mh - #r.Core["Get Stats"]:InvokeServer().Save.Hats
 
         for _ = 1, tb do
-            if not get then coroutine.yield() end
+            if not get then break end
             task.spawn(function()
                 if not get then return end
                 local _, h = r.Game.Shop:InvokeServer("Buy", "Presents", present)
@@ -231,37 +231,33 @@ local function AutoHatFarm()
                 wt = wt + 1
             end)
         end
-        repeat Wait(2) until wt == tb or not get
-        if not get then coroutine.yield() end
 
+        repeat task.wait() until wt == tb or not get
+        if not get then break end
         r.Game.Hats:InvokeServer("MultiDelete", td)
+        task.wait(1)
     end
+    hatFarmRunning = false
+    print("AutoHatFarm zakończony")
 end
 
-local hatFarmThread = coroutine.create(AutoHatFarm)
+SettingsTab:CreateSection("Other")
 
-local function NotifyDeletersList()
-local deletersList = table.concat(Deleters, ", ")
-    Rayfield:Notify({
-        Title = "Deleted pets list",
-        Content = deletersList,
-        Duration = 10,
-        Image = 4483362458,
-    })
-end
-
-local Section = SettingsTab:CreateSection("Other")
-
-local HatToggle = SettingsTab:CreateToggle({
+SettingsTab:CreateToggle({
     Name = "Auto Hat Farm",
     CurrentValue = false,
     Flag = "AutoHatFarmToggle",
     Callback = function(Value)
         get = Value
-        if Value then            coroutine.resume(hatFarmThread)
+        if Value and not hatFarmRunning then
+            hatFarmThread = task.spawn(AutoHatFarm)
         end
     end
 })
+
+local function Wait(x)
+    for i = 1, x do task.wait() end
+end
 
 local Button = SettingsTab:CreateButton({
    Name = "Deleted pets list",
