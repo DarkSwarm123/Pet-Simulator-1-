@@ -688,32 +688,30 @@ FarmingTab:CreateToggle({
     end
 })
 
-FarmingTab:CreateToggle({
-    Name = "Farm Christmas3 Cane",
-    CurrentValue = TargetNames["Christmas3 Cane"],
-    Flag = "FarmChristmas3Cane",
-    Callback = function(Value)
-        TargetNames["Christmas3 Cane"] = Value
-    end
-})
+local CoinToggles = {}
 
-FarmingTab:CreateToggle({
-    Name = "Farm Christmas3 Small Cane",
-    CurrentValue = TargetNames["Christmas3 Small Cane"],
-    Flag = "FarmChristmas3SmallCane",
-    Callback = function(Value)
-        TargetNames["Christmas3 Small Cane"] = Value
-    end
-})
+for coinName, _ in pairs(TargetNames) do
+    local flag = "Farm" .. coinName:gsub("%s+", ""):gsub("[^%w]", "") .. "Toggle"
 
-FarmingTab:CreateToggle({
-    Name = "Farm Christmas1 Sleigh",
-    CurrentValue = TargetNames["Christmas1 Sleigh"],
-    Flag = "FarmChristmas1Sleigh",
-    Callback = function(Value)
-        TargetNames["Christmas1 Sleigh"] = Value
+    local toggle = FarmingTab:CreateToggle({
+        Name = "Farm " .. coinName,
+        CurrentValue = TargetNames[coinName],
+        Flag = flag,
+        Callback = function(Value)
+            TargetNames[coinName] = Value
+        end
+    })
+
+    CoinToggles[coinName] = toggle
+end
+
+task.delay(0.2, function()
+    for coinName, toggle in pairs(CoinToggles) do
+        if toggle.CurrentValue then
+            toggle.Callback(true)
+        end
     end
-})
+end)
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     local VirtualUser = game:service('VirtualUser')
@@ -726,6 +724,14 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
 
 task.delay(0.2, function()
     for tierKey, toggle in pairs(TierToggles) do
+        if toggle.CurrentValue then
+            toggle.Callback(true)
+        end
+    end
+end)
+
+task.delay(0.4, function()
+    for coinName, toggle in pairs(CoinToggles) do
         if toggle.CurrentValue then
             toggle.Callback(true)
         end
