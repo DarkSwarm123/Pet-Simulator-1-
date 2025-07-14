@@ -592,7 +592,7 @@ FarmingTab:CreateToggle({
     Flag = "AutoLvlingToggle",
     Callback = function(Value)
         FarmLvLStart = Value
-        if Value and not farmLvlTaskRunning then
+        if FarmLvLStart and not farmLvlTaskRunning then
             farmLvlTaskRunning = true
             farmLvlTask = task.spawn(function()
                 while FarmLvLStart do
@@ -679,7 +679,7 @@ FarmingTab:CreateToggle({
     Flag = "EnableAutoFarm",
     Callback = function(Value)
         FarmStart = Value
-        if Value and not farmTaskRunning then
+        if FarmStart and not farmTaskRunning then
             farmTaskRunning = true
             farmTask = task.spawn(function()
                 while FarmStart do
