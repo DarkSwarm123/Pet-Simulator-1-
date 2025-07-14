@@ -1,4 +1,8 @@
 repeat task.wait() until game:IsLoaded()
+
+if getgenv().Active then return end
+getgenv().Active = true
+
 local RunService = game:GetService("RunService")
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -736,4 +740,8 @@ task.delay(0.4, function()
             toggle.Callback(true)
         end
     end
+end)
+
+task.delay(10, function()
+    getgenv().Active = false
 end)
