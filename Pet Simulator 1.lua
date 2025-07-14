@@ -504,63 +504,6 @@ SettingsTab:CreateToggle({
     end
 })
 
-local FarmStart = false
-
-local TargetNames = {
-    ["Christmas3 Cane"] = false,
-    ["Christmas3 Small Cane"] = false,
-    ["Christmas1 Sleigh"] = false
-}
-
-local PetTable = {}
-
-local function UpdatePetTable()
-    local Stats = workspace["__REMOTES"]["Core"]["Get Other Stats"]:InvokeServer()
-    local PlayerStats = Stats[game.Players.LocalPlayer.Name]
-    local Pets = PlayerStats["Save"]["Pets"]
-
-    PetTable = {}
-    for _, pet in ipairs(Pets) do
-        if pet.e then
-            local id = tonumber(pet.id)
-            local level = tonumber(pet.l)
-            if id and level and level == level then 
-                table.insert(PetTable, {
-                    ID = id,
-                    LEVEL = level
-                })
-            end
-        end
-    end
-end
-
-local function FarmCoin(Coin)
-    while FarmStart and Coin:FindFirstChild("CoinName") and TargetNames[Coin.CoinName.Value] do
-        for _, pet in ipairs(PetTable) do
-            workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", Coin.Name, pet.LEVEL, pet.ID)
-        end
-        task.wait(0.25)
-        if not Coin:IsDescendantOf(workspace["__THINGS"].Coins) then
-            break
-        end
-    end
-end
-
-task.spawn(function()
-    while true do
-        if FarmStart then
-            UpdatePetTable()
-            for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
-                if Coin:FindFirstChild("CoinName") and TargetNames[Coin.CoinName.Value] then
-                    FarmCoin(Coin)
-                    break
-                end
-            end
-        end
-        task.wait(1)
-    end
-end)
-
 local FarmLvLStart = false
 local LVLTOCREARING = 50e6
 
@@ -676,12 +619,72 @@ FarmingTab:CreateToggle({
 
 local FarmingSection = FarmingTab:CreateSection("Farm Settings")
 
+local FarmStart = false
+local farmTaskRunning = false
+local farmTask
+
+local TargetNames = {
+    ["Christmas3 Cane"] = false,
+    ["Christmas3 Small Cane"] = false,
+    ["Christmas1 Sleigh"] = false
+}
+
+local PetTable = {}
+
+local function UpdatePetTable()
+    local Stats = workspace["__REMOTES"]["Core"]["Get Other Stats"]:InvokeServer()
+    local PlayerStats = Stats[game.Players.LocalPlayer.Name]
+    local Pets = PlayerStats["Save"]["Pets"]
+
+    PetTable = {}
+    for _, pet in ipairs(Pets) do
+        if pet.e then
+            local id = tonumber(pet.id)
+            local level = tonumber(pet.l)
+            if id and level and level == level then 
+                table.insert(PetTable, {
+                    ID = id,
+                    LEVEL = level
+                })
+            end
+        end
+    end
+end
+
+local function FarmCoin(Coin)
+    while FarmStart and Coin:FindFirstChild("CoinName") and TargetNames[Coin.CoinName.Value] do
+        for _, pet in ipairs(PetTable) do
+            workspace["__REMOTES"]["Game"]["Coins"]:FireServer("Mine", Coin.Name, pet.LEVEL, pet.ID)
+        end
+        task.wait(0.25)
+        if not Coin:IsDescendantOf(workspace["__THINGS"].Coins) then
+            break
+        end
+    end
+end
+
 FarmingTab:CreateToggle({
     Name = "Enable Auto Farm",
     CurrentValue = FarmStart,
     Flag = "EnableAutoFarm",
     Callback = function(Value)
         FarmStart = Value
+        if Value and not farmTaskRunning then
+            farmTaskRunning = true
+            farmTask = task.spawn(function()
+                while FarmStart do
+                    UpdatePetTable()
+                    for _, Coin in ipairs(workspace["__THINGS"].Coins:GetChildren()) do
+                        if Coin:FindFirstChild("CoinName") and TargetNames[Coin.CoinName.Value] then
+                            FarmCoin(Coin)
+                            break
+                        end
+                    end
+                    task.wait(1)
+                end
+                farmTaskRunning = false
+            end)
+        end
     end
 })
 
