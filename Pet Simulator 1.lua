@@ -715,14 +715,6 @@ for coinName, _ in pairs(TargetNames) do
     CoinToggles[coinName] = toggle
 end
 
-task.delay(0.2, function()
-    for coinName, toggle in pairs(CoinToggles) do
-        if toggle.CurrentValue then
-            toggle.Callback(true)
-        end
-    end
-end)
-
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     local VirtualUser = game:service('VirtualUser')
     VirtualUser:CaptureController()
