@@ -394,61 +394,79 @@ end
 
 local function AutoCombineCheck()
     if not AutoCombineRunning then return end
-    task.spawn(function()
-        local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
-        local GoldTable, RainbowTable, DarkMatterTable = {}, {}, {}
-        for _, Pet in ipairs(Stats.Save.Pets) do
-            if not AutoCombineRunning then break end
-            if tostring(Pet.n) ~= "BIG Maskot" then
-                if Settings["Auto Combine"]["Gold"] and not Pet.g and not Pet.r and not Pet.dm then
-                    GoldTable[tostring(Pet.n)] = (GoldTable[tostring(Pet.n)] or 0) + 1
-                elseif Settings["Auto Combine"]["Rainbow"] and Pet.g and not Pet.r and not Pet.dm then
-                    RainbowTable[tostring(Pet.n)] = (RainbowTable[tostring(Pet.n)] or 0) + 1
-                elseif Settings["Auto Combine"]["Dark Matter"] and not Pet.g and Pet.r and not Pet.dm then
-                    DarkMatterTable[tostring(Pet.n)] = (DarkMatterTable[tostring(Pet.n)] or 0) + 1
+
+    local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
+    local GoldTable, RainbowTable, DarkMatterTable = {}, {}, {}
+
+    for _, Pet in ipairs(Stats.Save.Pets) do
+        if not AutoCombineRunning then break end
+        if tostring(Pet.n) ~= "BIG Maskot" then
+            if Settings["Auto Combine"]["Gold"] and not Pet.g and not Pet.r and not Pet.dm then
+                GoldTable[tostring(Pet.n)] = (GoldTable[tostring(Pet.n)] or 0) + 1
+            elseif Settings["Auto Combine"]["Rainbow"] and Pet.g and not Pet.r and not Pet.dm then
+                RainbowTable[tostring(Pet.n)] = (RainbowTable[tostring(Pet.n)] or 0) + 1
+            elseif Settings["Auto Combine"]["Dark Matter"] and not Pet.g and Pet.r and not Pet.dm then
+                DarkMatterTable[tostring(Pet.n)] = (DarkMatterTable[tostring(Pet.n)] or 0) + 1
+            end
+        end
+    end
+
+    -- GOLD
+    for PetN, Amount in pairs(GoldTable) do
+        if Amount >= 10 then
+            local GoldPets = {}
+            local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
+            for _, Pet in ipairs(Stats.Save.Pets) do
+                if tostring(Pet.n) == PetN and not Pet.g and not Pet.r and not Pet.dm then
+                    table.insert(GoldPets, Pet.id)
+                    if #GoldPets >= 10 then break end
+                end
+            end
+            if #GoldPets >= 10 then
+                for _, id in ipairs(GoldPets) do
+                    workspace["__REMOTES"]["Game"]["Golden Pets"]:InvokeServer(id)
                 end
             end
         end
+    end
 
-        -- Łączenie w Gold
-        for PetN, Amount in pairs(GoldTable) do
-            if Amount >= 10 then
-                task.spawn(function()
-                    for _, Pet in ipairs(Stats.Save.Pets) do
-                        if tostring(Pet.n) == tostring(PetN) and not Pet.g and not Pet.r and not Pet.dm then
-                            workspace["__REMOTES"]["Game"]["Golden Pets"]:InvokeServer(Pet.id)
-                        end
-                    end
-                end)()
+    -- RAINBOW
+    for PetN, Amount in pairs(RainbowTable) do
+        if Amount >= 7 then
+            local RainbowPets = {}
+            local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
+            for _, Pet in ipairs(Stats.Save.Pets) do
+                if tostring(Pet.n) == PetN and Pet.g and not Pet.r and not Pet.dm then
+                    table.insert(RainbowPets, Pet.id)
+                    if #RainbowPets >= 7 then break end
+                end
+            end
+            if #RainbowPets >= 7 then
+                for _, id in ipairs(RainbowPets) do
+                    workspace["__REMOTES"]["Game"]["Rainbow Pets"]:InvokeServer(id)
+                end
             end
         end
+    end
 
-        -- Łączenie w Rainbow
-        for PetN, Amount in pairs(RainbowTable) do
-            if Amount >= 7 then
-                task.spawn(function()
-                    for _, Pet in ipairs(Stats.Save.Pets) do
-                        if tostring(Pet.n) == tostring(PetN) and Pet.g and not Pet.r and not Pet.dm then
-                            workspace["__REMOTES"]["Game"]["Rainbow Pets"]:InvokeServer(Pet.id)
-                        end
-                    end
-                end)()
+    -- DARK MATTER
+    for PetN, Amount in pairs(DarkMatterTable) do
+        if Amount >= 5 then
+            local DMTable = {}
+            local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
+            for _, Pet in ipairs(Stats.Save.Pets) do
+                if tostring(Pet.n) == PetN and not Pet.g and Pet.r and not Pet.dm then
+                    table.insert(DMTable, Pet.id)
+                    if #DMTable >= 5 then break end
+                end
+            end
+            if #DMTable >= 5 then
+                for _, id in ipairs(DMTable) do
+                    workspace["__REMOTES"]["Game"]["Dark Matter Pets"]:InvokeServer(id)
+                end
             end
         end
-
-        -- Łączenie w Dark Matter
-        for PetN, Amount in pairs(DarkMatterTable) do
-            if Amount >= 5 then
-                task.spawn(function()
-                    for _, Pet in ipairs(Stats.Save.Pets) do
-                        if tostring(Pet.n) == tostring(PetN) and not Pet.g and Pet.r and not Pet.dm then
-                            workspace["__REMOTES"]["Game"]["Dark Matter Pets"]:InvokeServer(Pet.id)
-                        end
-                    end
-                end)()
-            end
-        end
-    end)()
+    end
 end
 
 local TierToggles = {}
