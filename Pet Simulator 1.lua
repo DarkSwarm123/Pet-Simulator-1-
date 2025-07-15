@@ -330,13 +330,7 @@ local function DeleteOtherUnwantedPets()
     end
 
     if #ToDelete > 0 then
-        workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("MultiDelete", ToDelete)
-        Rayfield:Notify({
-            Title = "Auto Deleters",
-            Content = "Usunięto " .. #ToDelete .. " petów.",
-            Duration = 3,
-            Image = 4483362458
-        })
+        workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("MultiDelete", ToDelete)        
     end
 end
 
