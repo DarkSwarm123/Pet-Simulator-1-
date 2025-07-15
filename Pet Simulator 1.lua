@@ -319,16 +319,25 @@ end
 
 local function DeleteOtherUnwantedPets()
     if not AutoDeletersRunning then return end
-    task.spawn(function()
-        local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
-        for _, Pet in ipairs(Stats.Save.Pets) do
-            if not AutoDeletersRunning then break end
-            if CheckDeleters(Pet.n) then
-                task.defer(function()                    workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("Delete", Pet.id)
-                end)
-            end
+    local Stats = workspace["__REMOTES"]["Core"]["Get Stats"]:InvokeServer()
+    local ToDelete = {}
+
+    for _, Pet in ipairs(Stats.Save.Pets) do
+        if not AutoDeletersRunning then break end
+        if CheckDeleters(Pet.n) then
+            table.insert(ToDelete, Pet.id)
         end
-    end)()
+    end
+
+    if #ToDelete > 0 then
+        workspace["__REMOTES"]["Game"]["Inventory"]:InvokeServer("MultiDelete", ToDelete)
+        Rayfield:Notify({
+            Title = "Auto Deleters",
+            Content = "Usunięto " .. #ToDelete .. " petów.",
+            Duration = 3,
+            Image = 4483362458
+        })
+    end
 end
 
 local function BuyEgg(tier)
@@ -506,11 +515,10 @@ SettingsTab:CreateToggle({
     CurrentValue = Settings["Auto Deleters"]["Enabled"],
     Flag = "AutoDeleterToggle",
     Callback = function(Value)
-        AutoDeletersRunning = Value -- Aktualizacja flagi
+        AutoDeletersRunning = Value
         if Value then
             task.spawn(function()
-                while AutoDeletersRunning do
-                    DeleteOtherUnwantedPets()
+                while AutoDeletersRunning do                    DeleteOtherUnwantedPets()
                     task.wait(2)
                 end
             end)
