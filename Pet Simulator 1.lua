@@ -337,9 +337,50 @@ end
 local function BuyEgg(tier)
     local success, result = workspace["__REMOTES"]["Game"]["Shop"]:InvokeServer("Buy", "Eggs", tier, Settings["Auto Egg"]["Triple Egg Open"])
     if not success then
-        warn("Nie udało się kupić jajka: " .. tostring(result))
+        -- Powiadomienie przez Rayfield
+        Rayfield:Notify({
+            Title = "❌ Nieudany zakup jajka",
+            Content = tostring(result),
+            Duration = 5,
+        })
+        return false
     end
-    return success
+
+    -- Obsługa automatycznego usuwania
+    if AutoDeletersRunning and typeof(result) == "table" then
+        local hatchData = {}
+
+        if typeof(result[1]) == "table" and typeof(result[1][1]) == "table" then
+            -- triple hatch
+            for _, sub in ipairs(result) do
+                for _, pet in ipairs(sub) do
+                    table.insert(hatchData, pet)
+                end
+            end
+        else
+            -- single hatch
+            for _, pet in ipairs(result) do
+                table.insert(hatchData, pet)
+            end
+        end
+
+        -- Sprawdź i usuń niechciane pety
+        local ToDelete = {}
+        for _, pet in ipairs(hatchData) do
+            if CheckDeleters(pet.n) then
+                table.insert(ToDelete, pet.id)
+                warn("🗑️ Usuwam: " .. (Directory.Pets[pet.n] and Directory.Pets[pet.n].DisplayName or tostring(pet.n)))
+            else
+                warn("✅ Zachowano: " .. (Directory.Pets[pet.n] and Directory.Pets[pet.n].DisplayName or tostring(pet.n)))
+            end
+        end
+
+        if #ToDelete > 0 then
+            workspace.__REMOTES.Game.Inventory:InvokeServer("MultiDelete", ToDelete)
+        end
+    end
+
+    return true
 end
 
 local turbo = true
