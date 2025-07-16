@@ -563,12 +563,14 @@ SettingsTab:CreateToggle({
     end
 })
 
+local allow = false 
 SettingsTab:CreateToggle({
     Name = "Auto Deleters",
     CurrentValue = Settings["Auto Deleters"]["Enabled"],
     Flag = "AutoDeleterToggle",
     Callback = function(Value)
         AutoDeletersRunning = Value
+if allow then
         if Value then
             task.spawn(function()
                 while AutoDeletersRunning do                    DeleteOtherUnwantedPets()
@@ -577,6 +579,7 @@ SettingsTab:CreateToggle({
             end)
         end
     end
+end
 })
 
 local FarmLvLStart = false
